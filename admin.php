@@ -3,10 +3,8 @@ session_start();
 require_once 'config.php';
 
 // --- CONFIGURACIÓN DE SEGURIDAD ---
-// Cambia esta contraseña por la que tú quieras
 $password_admin = "Capuchinera2026"; 
 
-// Procesar el login
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['password'])) {
     if ($_POST['password'] === $password_admin) {
         $_SESSION['logueado'] = true;
@@ -15,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['password'])) {
     }
 }
 
-// Procesar cerrar sesión
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: admin.php");
@@ -50,9 +47,43 @@ if (!isset($_SESSION['logueado'])) {
     exit;
 }
 
-// --- SI ESTÁ LOGUEADO, MOSTRAR DASHBOARD ---
+// --- LOGICA DEL CRUD ---
 
-// Consultas para las métricas
+// 1. AGREGAR INVITADO
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'add') {
+    $nuevo_nombre = $conn->real_escape_string(trim($_POST['nuevo_nombre']));
+    if (!empty($nuevo_nombre)) {
+        $base_token = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nuevo_nombre));
+        $nuevo_token = $base_token . '-' . rand(100, 999);
+        $conn->query("INSERT INTO invitados (nombre, token) VALUES ('$nuevo_nombre', '$nuevo_token')");
+        header("Location: admin.php");
+        exit;
+    }
+}
+
+// 2. ELIMINAR INVITADO
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete') {
+    $id_borrar = intval($_POST['id_borrar']);
+    if ($id_borrar > 0) {
+        $conn->query("DELETE FROM invitados WHERE id = $id_borrar");
+        header("Location: admin.php");
+        exit;
+    }
+}
+
+// 3. EDITAR INVITADO
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
+    $id_editar = intval($_POST['id_editar']);
+    $nombre_editado = $conn->real_escape_string(trim($_POST['nombre_editado']));
+    if ($id_editar > 0 && !empty($nombre_editado)) {
+        $conn->query("UPDATE invitados SET nombre = '$nombre_editado' WHERE id = $id_editar");
+        header("Location: admin.php");
+        exit;
+    }
+}
+
+// --- CONSULTAS PARA EL DASHBOARD ---
+
 $res_total = $conn->query("SELECT SUM(aporte) as total FROM invitados");
 $total_recaudado = $res_total->fetch_assoc()['total'] ?? 0;
 
@@ -65,7 +96,6 @@ $res_stats = $conn->query("
 ");
 $stats = $res_stats->fetch_assoc();
 
-// Obtener todos los invitados
 $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre ASC");
 ?>
 
@@ -77,28 +107,38 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
     <title>Dashboard - Graduación</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Función para copiar el mensaje de WhatsApp al portapapeles
         function copiarLink(nombre, token) {
             const url = `https://ingporras.com/?invitado=${token}`;
-            // Extraemos el primer nombre para el mensaje
+            // Toma la primera palabra del nombre actual en la tabla
             const primerNombre = nombre.split(' ')[0];
-            const mensaje = `¡Hola ${primerNombre}! Te comparto la invitación para mi celebración de graduación de Ingeniería. Por favor confirma tu asistencia en este enlace: ${url}`;
+            const mensaje = `¡Hola ${primerNombre}! Te comparto la invitación para mi celebración de graduación de Ingeniería en Sistemas. Por favor confirma tu asistencia en este enlace: ${url}`;
             
             navigator.clipboard.writeText(mensaje).then(() => {
                 alert(`¡Mensaje para ${primerNombre} copiado al portapapeles!`);
             });
+        }
+
+        function editarNombre(id, nombreActual) {
+            const nuevoNombre = prompt("Editar nombre del invitado (Esto cambiará cómo se le saluda):", nombreActual);
+            
+            // Verificamos que no haya cancelado y que el nombre no esté vacío
+            if (nuevoNombre !== null && nuevoNombre.trim() !== "" && nuevoNombre !== nombreActual) {
+                document.getElementById('input-id-editar').value = id;
+                document.getElementById('input-nombre-editado').value = nuevoNombre.trim();
+                document.getElementById('form-editar').submit();
+            }
         }
     </script>
 </head>
 <body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans text-slate-800">
 
     <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <h1 class="text-3xl font-bold text-slate-800">Dashboard de Invitados</h1>
-            <a href="?logout=true" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Cerrar Sesión</a>
+            <a href="?logout=true" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">Cerrar Sesión</a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-blue-500">
                 <p class="text-sm text-slate-500 font-medium">Recaudado (Capuchinera)</p>
                 <p class="text-3xl font-bold text-slate-800 mt-2">Q<?php echo number_format($total_recaudado, 2); ?></p>
@@ -117,6 +157,25 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
             </div>
         </div>
 
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+            <form method="POST" action="" class="flex flex-col md:flex-row gap-4 items-end">
+                <input type="hidden" name="action" value="add">
+                <div class="flex-grow w-full">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Agregar Nuevo Invitado</label>
+                    <input type="text" name="nuevo_nombre" placeholder="Nombre completo o apodo del invitado" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-sm">
+                    + Agregar
+                </button>
+            </form>
+        </div>
+
+        <form id="form-editar" method="POST" action="" style="display: none;">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="id_editar" id="input-id-editar">
+            <input type="hidden" name="nombre_editado" id="input-nombre-editado">
+        </form>
+
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -125,7 +184,7 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
                             <th class="p-4 font-medium">Nombre</th>
                             <th class="p-4 font-medium text-center">Estado</th>
                             <th class="p-4 font-medium text-right">Aporte</th>
-                            <th class="p-4 font-medium text-center">Acción (Link)</th>
+                            <th class="p-4 font-medium text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -144,10 +203,22 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
                                 <td class="p-4 text-right font-medium text-slate-600">
                                     Q<?php echo number_format($row['aporte'], 2); ?>
                                 </td>
-                                <td class="p-4 text-center">
+                                <td class="p-4 text-center flex justify-center gap-2 flex-wrap">
                                     <button onclick="copiarLink('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded text-sm font-medium transition border border-indigo-200">
                                         Copiar Msg
                                     </button>
+                                    
+                                    <button onclick="editarNombre(<?php echo $row['id']; ?>, '<?php echo addslashes($row['nombre']); ?>')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded text-sm font-medium transition border border-amber-200">
+                                        Editar
+                                    </button>
+
+                                    <form method="POST" action="" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a <?php echo addslashes($row['nombre']); ?>?');">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id_borrar" value="<?php echo $row['id']; ?>">
+                                        <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded text-sm font-medium transition border border-red-200">
+                                            Borrar
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
