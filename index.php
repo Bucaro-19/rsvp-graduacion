@@ -2,8 +2,8 @@
 require_once 'config.php';
 
 // --- CONFIGURACIÓN DE ENLACES EXTERNOS ---
-$waze_link = "https://waze.com/ul?q=Zion%20Restaurant%2C%20San%20Lucas%20Sacatep%C3%A9quez&ll=14.6136,-90.6558&navigate=yes";
-$bi_cobro_link = "URL_DE_TU_LINK_COBRO_BI_AQUI"; // Pon tu link real de BI aquí
+$waze_link = "https://www.waze.com/en/live-map/directions/gt/sacatepequez/san-lucas-sacatepequez/zion-food-and-drinks?place=ChIJDxP-JggLiYURqlXH1529H68";
+$bi_cobro_link = "https://belappgt.bi.com.gt/qr?type=tm&qrdata=60c215c4876ddaef27f406f01a303d255eb0ce6f579138a0efa38fc90ff211a3";
 
 // --- Obtener Token de la URL ---
 $token_url = isset($_GET['invitado']) ? $_GET['invitado'] : '';
@@ -75,7 +75,7 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     <p class="text-lg text-slate-700 mt-3 leading-relaxed">
                         Me gustaría que me acompañes en este momento tan especial e importante. Es un gusto poder celebrarlo contigo.
                     </p>
-                    <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 mt-6 text-left">
+                    <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 mt-6 text-left shadow-sm">
                         <strong>🌮 Almuerzón Pérez:</strong> Habrá un buffet de tacos, así que por favor llega con hambre. ¡Te espero!
                     </div>
                 </div>
@@ -122,7 +122,7 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
 
             <?php if ($mensaje_exito): ?>
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-5 rounded-xl text-center font-medium shadow-md">
-                    ¡Gracias por responder! 
+                    ¡Gracias por responder! Tu confirmación se ha guardado con éxito.
                 </div>
             <?php elseif ($invitado): ?>
                 
@@ -178,17 +178,22 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     </a>
                 </div>
 
-                <div id="modal-zigi" class="hidden mt-4 text-center bg-white p-4 rounded-xl border border-[#6C22D6] shadow-sm">
-                    <p class="text-sm font-bold text-[#6C22D6] mb-2">Escanea este código desde tu app Zigi</p>
-                    <img src="zigi-qr.png" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-3">
-                    <a href="zigi-qr.png" download class="text-sm text-[#6C22D6] font-bold underline hover:text-[#5A1CB2]">Descargar Imagen QR</a>
+                <div id="modal-zigi" class="hidden mt-4 text-center bg-white p-6 rounded-xl border border-[#6C22D6] shadow-md">
+                    <p class="text-base font-bold text-[#6C22D6] mb-1">Escanea este código desde tu app Zigi</p>
+                    <p class="text-sm text-slate-600 mb-4 bg-purple-50 p-2 rounded-lg border border-purple-100">
+                        💡 <strong>¡Súper dato!</strong> Este código también funciona con <strong>CUIIK</strong> si usas otro banco.
+                    </p>
+                    <img src="zigi-qr.png" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
+                    <a href="zigi-qr.png" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
+                        📥 Descargar Código QR
+                    </a>
                 </div>
 
                 <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
                     <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-3">Depósito o Transferencia</h4>
-                    <p class="text-slate-700 text-base">Banco Industrial, Cuenta Monetaria</p>
-                    <p class="text-2xl font-bold text-[#002B5B] mt-1">123-456789-0</p>
-                    <p class="text-slate-600 text-sm mt-1">A nombre de: Jose Aurelio Porras Bucaro</p>
+                    <p class="text-slate-700 text-base">Banco Industrial, Cuenta de Ahorro</p>
+                    <p class="text-3xl font-bold text-[#002B5B] mt-1 tracking-wider">5729909</p>
+                    <p class="text-slate-600 text-sm mt-2 font-medium">A nombre de: Jose Aurelio Porras Bucaro</p>
                 </div>
             </div>
 
