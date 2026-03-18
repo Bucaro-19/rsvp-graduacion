@@ -204,7 +204,7 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
             <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
                 <h2 class="text-lg font-bold mb-4 text-[#002B5B] text-center">Progreso de la Capuchinera ☕</h2>
                 
-                <img id="img-capuchinera" src="capuchinera.webp" alt="Capuchinera y Molino" class="w-full h-48 object-cover rounded-xl mb-6 shadow-sm border border-slate-200">
+               <img id="img-capuchinera" src="capuchinera.webp" alt="Capuchinera Oster" class="w-full max-h-72 object-contain mx-auto mb-6 drop-shadow-md">
 
                 <div class="w-full bg-slate-300 rounded-full h-7 mb-2 overflow-hidden shadow-inner border border-slate-300">
                     <div class="bg-gradient-to-r from-[#C5A059] to-[#E6C68A] h-7 rounded-full transition-all duration-1000 ease-out flex items-center justify-end pr-3" style="width: <?php echo $ancho_barra; ?>%;">
