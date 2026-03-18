@@ -195,8 +195,8 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     <p class="text-sm text-slate-600 mb-4 bg-purple-50 p-2 rounded-lg border border-purple-100">
                         💡 <strong>¡Súper dato!</strong> Este código también funciona con <strong>CUIIK</strong> si usas otro banco.
                     </p>
-                    <img src="zigi-qr.png" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
-                    <a href="zigi-qr.png" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
+                    <img src="zigi-qr.PNG" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
+                    <a href="zigi-qr.PNG" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
                         📥 Descargar Código QR
                     </a>
                 </div>
