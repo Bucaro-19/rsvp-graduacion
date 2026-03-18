@@ -31,8 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $invitado) {
     }
 }
 
-// --- Cálculo de la Barra de Progreso ---
-$meta = 3500;
+// --- CÁLCULO DE LA BARRA DE PROGRESO ---
+// AQUÍ CAMBIAS LA META DE LA CAPUCHINERA:
+$meta = 1778; 
+
 $res_suma = $conn->query("SELECT SUM(aporte) as total FROM invitados");
 $total_recaudado = $res_suma->fetch_assoc()['total'] ?? 0;
 $porcentaje = ($total_recaudado / $meta) * 100;
@@ -173,7 +175,9 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     </button>
                     
                     <a href="<?php echo $bi_cobro_link; ?>" target="_blank" class="inline-flex items-center justify-center gap-3 bg-[#004791] hover:bg-[#003B78] text-white font-bold py-3 px-6 rounded-xl shadow transition text-center">
-                        <img src="https://www.bi.com.gt/images/default-source/default-album/biiconopagobi.png?sfvrsn=31c519d5_0" alt="bi cobro" class="h-6 w-6">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
                         Link de Cobro BI
                     </a>
                 </div>
@@ -183,8 +187,8 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     <p class="text-sm text-slate-600 mb-4 bg-purple-50 p-2 rounded-lg border border-purple-100">
                         💡 <strong>¡Súper dato!</strong> Este código también funciona con <strong>CUIIK</strong> si usas otro banco.
                     </p>
-                    <img src="zigi-qr.png" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
-                    <a href="zigi-qr.png" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
+                    <img src="zigi-qr.PNG" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
+                    <a href="zigi-qr.PNG" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
                         📥 Descargar Código QR
                     </a>
                 </div>
@@ -198,7 +202,10 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
             </div>
 
             <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
-                <h2 class="text-lg font-bold mb-4 text-[#002B5B]">Progreso de la Capuchinera ☕</h2>
+                <h2 class="text-lg font-bold mb-4 text-[#002B5B] text-center">Progreso de la Capuchinera ☕</h2>
+                
+                <img id="img-capuchinera" src="capuchinera.webp" alt="Capuchinera y Molino" class="w-full h-48 object-cover rounded-xl mb-6 shadow-sm border border-slate-200">
+
                 <div class="w-full bg-slate-300 rounded-full h-7 mb-2 overflow-hidden shadow-inner border border-slate-300">
                     <div class="bg-gradient-to-r from-[#C5A059] to-[#E6C68A] h-7 rounded-full transition-all duration-1000 ease-out flex items-center justify-end pr-3" style="width: <?php echo $ancho_barra; ?>%;">
                         <span class="text-xs font-bold text-[#002B5B]"><?php echo round($ancho_barra); ?>%</span>
