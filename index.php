@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $invitado) {
 }
 
 // --- CÁLCULO DE LA BARRA DE PROGRESO ---
-$meta = 3500; 
+$meta = 1778; 
 
 $res_suma = $conn->query("SELECT SUM(aporte) as total FROM invitados");
 $total_recaudado = $res_suma->fetch_assoc()['total'] ?? 0;
