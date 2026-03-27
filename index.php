@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $invitado) {
 }
 
 // --- CÁLCULO DE LA BARRA DE PROGRESO ---
-$meta = 1778; 
+$meta = 3500; 
 
 $res_suma = $conn->query("SELECT SUM(aporte) as total FROM invitados");
 $total_recaudado = $res_suma->fetch_assoc()['total'] ?? 0;
@@ -73,7 +73,6 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                 $palabra1 = mb_strtolower($partes_nombre[0], 'UTF-8');
                 $prefijos = ['tia', 'tía', 'tio', 'tío', 'papa', 'papá', 'mama', 'mamá'];
                 
-                // Si la primera palabra es un prefijo y hay más de una palabra en el nombre
                 if (in_array($palabra1, $prefijos) && count($partes_nombre) > 1) {
                     $primer_nombre = $partes_nombre[0] . ' ' . $partes_nombre[1];
                 } else {
@@ -195,8 +194,8 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     <p class="text-sm text-slate-600 mb-4 bg-purple-50 p-2 rounded-lg border border-purple-100">
                         💡 <strong>¡Súper dato!</strong> Este código también funciona con <strong>CUIIK</strong> si usas otro banco.
                     </p>
-                    <img src="zigi-qr.PNG" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
-                    <a href="zigi-qr.PNG" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
+                    <img src="zigi-qr.png" alt="Zigi QR" class="mx-auto w-48 h-48 rounded-lg shadow-sm border mb-4">
+                    <a href="zigi-qr.png" download class="inline-block bg-slate-100 text-[#6C22D6] font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition">
                         📥 Descargar Código QR
                     </a>
                 </div>
@@ -225,9 +224,16 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                 </div>
 
                 <?php if ($porcentaje >= 100): ?>
-                    <div class="mt-6 bg-gradient-to-r from-yellow-100 to-amber-100 border-2 border-amber-300 p-4 rounded-xl text-center shadow-lg animate-bounce">
-                        <p class="text-xl font-bold text-amber-800">🎉 ¡META ALCANZADA! 🎉</p>
-                        <p class="text-amber-700 text-sm mt-1">¡Muchísimas gracias a todos! La capuchinera ya es una realidad. ☕💛</p>
+                    <div class="mt-6 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-amber-300 p-5 rounded-xl text-center shadow-md">
+                        <p class="text-2xl font-bold text-amber-600 animate-bounce">🎉 ¡META ALCANZADA! 🎉</p>
+                        <p class="text-amber-800 font-medium text-base mt-2">¡Muchísimas gracias a todos! La capuchinera ya es una realidad. ☕💛</p>
+                        
+                        <div class="mt-4 bg-white/60 p-4 rounded-lg border border-amber-200 text-left">
+                            <p class="text-amber-900 text-sm leading-relaxed">
+                                💡 <strong>¿Quieres seguir apoyando?</strong><br>
+                                Si aún deseas sumar un detalle, cualquier aporte extra me servirá muchísimo para comprar utensilios, buen café en grano y hacer mis experimentos de barista. ¡Mil gracias por tanto cariño!
+                            </p>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
