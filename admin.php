@@ -109,7 +109,6 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
     <script>
         function copiarLink(nombre, token) {
             const url = `https://ingporras.com/?invitado=${token}`;
-            // Toma la primera palabra del nombre actual en la tabla
             const primerNombre = nombre.split(' ')[0];
             const mensaje = `¡Hola ${primerNombre}! Te comparto la invitación para mi celebración de graduación de Ingeniería en Sistemas. Por favor confirma tu asistencia en este enlace: ${url}`;
             
@@ -118,10 +117,19 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
             });
         }
 
+        function copiarRecordatorio(nombre, token) {
+            const url = `https://ingporras.com/?invitado=${token}`;
+            const primerNombre = nombre.split(' ')[0];
+            const mensaje = `¡Hola ${primerNombre}! 👋 Espero que estés muy bien. Te escribo para dejarte un recordatorio súper amigable de mi celebración de graduación. Hoy 1 de abril es el último día para confirmar, ya que debo enviar el listado final al restaurante para los platillos. Por favor, ayúdame confirmando tu asistencia (o si no puedes ir) en este enlace: ${url} \n\n¡Si no puedes acompañarme no te preocupes, lo entiendo perfectamente! Un abrazo grande.`;
+            
+            navigator.clipboard.writeText(mensaje).then(() => {
+                alert(`¡Recordatorio amigable para ${primerNombre} copiado al portapapeles!`);
+            });
+        }
+
         function editarNombre(id, nombreActual) {
             const nuevoNombre = prompt("Editar nombre del invitado (Esto cambiará cómo se le saluda):", nombreActual);
             
-            // Verificamos que no haya cancelado y que el nombre no esté vacío
             if (nuevoNombre !== null && nuevoNombre.trim() !== "" && nuevoNombre !== nombreActual) {
                 document.getElementById('input-id-editar').value = id;
                 document.getElementById('input-nombre-editado').value = nuevoNombre.trim();
@@ -204,10 +212,14 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
                                     Q<?php echo number_format($row['aporte'], 2); ?>
                                 </td>
                                 <td class="p-4 text-center flex justify-center gap-2 flex-wrap">
-                                    <button onclick="copiarLink('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded text-sm font-medium transition border border-indigo-200">
+                                    <button onclick="copiarLink('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded text-sm font-medium transition border border-indigo-200" title="Mensaje Original">
                                         Copiar Msg
                                     </button>
                                     
+                                    <button onclick="copiarRecordatorio('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-sky-50 text-sky-600 hover:bg-sky-100 px-3 py-1.5 rounded text-sm font-medium transition border border-sky-200" title="Enviar Recordatorio">
+                                        Recordatorio
+                                    </button>
+
                                     <button onclick="editarNombre(<?php echo $row['id']; ?>, '<?php echo addslashes($row['nombre']); ?>')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded text-sm font-medium transition border border-amber-200">
                                         Editar
                                     </button>
