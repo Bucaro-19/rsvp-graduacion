@@ -28,9 +28,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $invitado) {
     
     if ($update->execute()) {
         $mensaje_exito = true;
-        // Actualizamos la variable en memoria para que el mensaje de recordatorio se muestre inmediatamente
         $invitado['asiste'] = $asiste;
         $invitado['aporte'] = $aporte; 
+
+        // --- LÓGICA DE NOTIFICACIÓN POR CORREO ---
+        // ¡CAMBIA ESTE CORREO POR EL TUYO!
+        $correo_admin = "joseaurelioporras97@gmail.com"; 
+        
+        $asunto = "🎓 RSVP Graduación: " . $invitado['nombre'];
+        $estado_texto = ($asiste == 1) ? "✅ Sí asistirá" : "❌ No podrá asistir";
+        
+        $mensaje_email = "Hola Aurelio,\n\n";
+        $mensaje_email .= "Tienes una nueva respuesta para el Almuerzón Pérez:\n\n";
+        $mensaje_email .= "👤 Invitado: " . $invitado['nombre'] . "\n";
+        $mensaje_email .= "📅 Estado: " . $estado_texto . "\n";
+        $mensaje_email .= "☕ Aporte registrado: Q" . number_format($aporte, 2) . "\n\n";
+        $mensaje_email .= "Puedes ver todos los detalles en tu dashboard:\n";
+        $mensaje_email .= "https://ingporras.com/admin.php\n";
+        
+        // Cabeceras para que el servidor lo envíe correctamente
+        $headers = "From: notificaciones@ingporras.com\r\n";
+        $headers .= "Reply-To: no-reply@ingporras.com\r\n";
+        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        
+        // La @ evita que si el servidor de correo falla, le tire un error al invitado en la pantalla
+        @mail($correo_admin, $asunto, $mensaje_email, $headers);
     }
 }
 
@@ -71,7 +93,6 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
         <div class="p-8 space-y-8">
 
             <?php if ($invitado): 
-                // --- LÓGICA DE NOMBRES INTELIGENTE ---
                 $partes_nombre = explode(' ', trim($invitado['nombre']));
                 $palabra1 = mb_strtolower($partes_nombre[0], 'UTF-8');
                 $prefijos = ['tia', 'tía', 'tio', 'tío', 'papa', 'papá', 'mama', 'mamá'];
