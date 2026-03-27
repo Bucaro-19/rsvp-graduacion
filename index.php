@@ -10,7 +10,7 @@ $token_url = isset($_GET['invitado']) ? $_GET['invitado'] : '';
 $invitado = null;
 
 if (!empty($token_url)) {
-    $stmt = $conn->prepare("SELECT id, nombre, asiste FROM invitados WHERE token = ?");
+    $stmt = $conn->prepare("SELECT id, nombre, asiste, aporte FROM invitados WHERE token = ?");
     $stmt->bind_param("s", $token_url);
     $stmt->execute();
     $resultado = $stmt->get_result();
@@ -28,11 +28,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $invitado) {
     
     if ($update->execute()) {
         $mensaje_exito = true;
+        // Actualizamos la variable en memoria para que el mensaje de recordatorio se muestre inmediatamente
+        $invitado['asiste'] = $asiste;
+        $invitado['aporte'] = $aporte; 
     }
 }
 
 // --- CÁLCULO DE LA BARRA DE PROGRESO ---
-$meta = 1778; 
+$meta = 3500; 
 
 $res_suma = $conn->query("SELECT SUM(aporte) as total FROM invitados");
 $total_recaudado = $res_suma->fetch_assoc()['total'] ?? 0;
@@ -141,8 +144,8 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                     <div>
                         <select name="asiste" required class="w-full px-4 py-3 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] text-lg transition mb-4">
                             <option value="">Selecciona una opción...</option>
-                            <option value="si">¡Sí, ahí estaré!</option>
-                            <option value="no">Lamentablemente no podré ir</option>
+                            <option value="si" <?php echo (isset($invitado['asiste']) && $invitado['asiste'] == 1) ? 'selected' : ''; ?>>¡Sí, ahí estaré!</option>
+                            <option value="no" <?php echo (isset($invitado['asiste']) && $invitado['asiste'] == 0) ? 'selected' : ''; ?>>Lamentablemente no podré ir</option>
                         </select>
                     </div>
 
@@ -152,12 +155,12 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
                             Mi gran deseo es poder comprarme una <strong>capuchinera</strong>. Si está en tus manos el ayudarme con lo que desees, lo recibo con mucho amor, mas no es obligatorio.
                         </p>
                         
-                        <label class="block text-sm font-medium mb-1">Si hiciste un aporte, regístralo aquí (Opcional):</label>
+                        <label class="block text-sm font-medium mb-1">Si harás un aporte, regístralo aquí (Opcional):</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <span class="text-slate-600 text-lg">Q</span>
                             </div>
-                            <input type="number" step="0.01" min="0" name="aporte" placeholder="0.00" class="w-full pl-10 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] text-lg transition">
+                            <input type="number" step="0.01" min="0" name="aporte" placeholder="0.00" value="<?php echo ($invitado['aporte'] > 0) ? $invitado['aporte'] : ''; ?>" class="w-full pl-10 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] text-lg transition">
                         </div>
                     </div>
 
@@ -175,6 +178,15 @@ $ancho_barra = ($porcentaje > 100) ? 100 : $porcentaje;
             <div class="border-t border-slate-100 pt-8 mt-8 space-y-6 bg-slate-50 p-6 rounded-2xl shadow-inner">
                 <h3 class="text-xl font-bold text-[#002B5B] text-center">Datos para aportar</h3>
                 
+                <?php if ($invitado && $invitado['aporte'] > 0): ?>
+                    <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl p-5 mb-6 shadow-sm">
+                        <p class="font-bold text-lg mb-2">☕ ¡Mil gracias por tu aporte de Q<?php echo number_format($invitado['aporte'], 2); ?>!</p>
+                        <p class="text-sm leading-relaxed">
+                            <strong>Recordatorio amigable:</strong> Si ya anotaste tu aporte arriba pero se te pasó hacer la transferencia, no hay pena. Aquí abajo te dejo los métodos de pago para cuando te quede bien hacer el depósito. ¡Te lo agradezco muchísimo!
+                        </p>
+                    </div>
+                <?php endif; ?>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button type="button" onclick="document.getElementById('modal-zigi').classList.toggle('hidden')" class="inline-flex items-center justify-center gap-3 bg-[#6C22D6] hover:bg-[#5A1CB2] text-white font-bold py-3 px-6 rounded-xl shadow transition text-center w-full">
                         <img src="https://zigi.app/favicon.ico" alt="zigi" class="h-6 w-6">
