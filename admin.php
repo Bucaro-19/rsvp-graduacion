@@ -71,12 +71,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// 3. EDITAR INVITADO
+// 3. EDITAR INVITADO (NOMBRE Y ESTADO)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
     $id_editar = intval($_POST['id_editar']);
     $nombre_editado = $conn->real_escape_string(trim($_POST['nombre_editado']));
+    $estado_editado = $_POST['estado_editado']; // Puede ser 'null', '1', o '0'
+
     if ($id_editar > 0 && !empty($nombre_editado)) {
-        $conn->query("UPDATE invitados SET nombre = '$nombre_editado' WHERE id = $id_editar");
+        // Lógica para el estado
+        if ($estado_editado === 'null') {
+            $asiste_sql = "NULL";
+        } else {
+            $asiste_sql = intval($estado_editado);
+        }
+
+        $conn->query("UPDATE invitados SET nombre = '$nombre_editado', asiste = $asiste_sql WHERE id = $id_editar");
         header("Location: admin.php");
         exit;
     }
@@ -107,6 +116,7 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
     <title>Dashboard - Graduación</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Función para enlace normal
         function copiarLink(nombre, token) {
             const url = `https://ingporras.com/?invitado=${token}`;
             const primerNombre = nombre.split(' ')[0];
@@ -117,6 +127,7 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
             });
         }
 
+        // Función para enlace de último día
         function copiarRecordatorio(nombre, token) {
             const url = `https://ingporras.com/?invitado=${token}`;
             const primerNombre = nombre.split(' ')[0];
@@ -127,14 +138,18 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
             });
         }
 
-        function editarNombre(id, nombreActual) {
-            const nuevoNombre = prompt("Editar nombre del invitado (Esto cambiará cómo se le saluda):", nombreActual);
+        // Funciones para el Modal de Edición Profesional
+        function abrirModalEditar(id, nombreActual, estadoActual) {
+            document.getElementById('input-id-editar').value = id;
+            document.getElementById('input-nombre-editado').value = nombreActual;
+            document.getElementById('select-estado-editado').value = estadoActual;
             
-            if (nuevoNombre !== null && nuevoNombre.trim() !== "" && nuevoNombre !== nombreActual) {
-                document.getElementById('input-id-editar').value = id;
-                document.getElementById('input-nombre-editado').value = nuevoNombre.trim();
-                document.getElementById('form-editar').submit();
-            }
+            // Mostrar el modal
+            document.getElementById('modal-editar').classList.remove('hidden');
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modal-editar').classList.add('hidden');
         }
     </script>
 </head>
@@ -178,12 +193,6 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
             </form>
         </div>
 
-        <form id="form-editar" method="POST" action="" style="display: none;">
-            <input type="hidden" name="action" value="edit">
-            <input type="hidden" name="id_editar" id="input-id-editar">
-            <input type="hidden" name="nombre_editado" id="input-nombre-editado">
-        </form>
-
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -213,14 +222,18 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
                                 </td>
                                 <td class="p-4 text-center flex justify-center gap-2 flex-wrap">
                                     <button onclick="copiarLink('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded text-sm font-medium transition border border-indigo-200" title="Mensaje Original">
-                                        Copiar Msg
+                                        Msg
                                     </button>
                                     
                                     <button onclick="copiarRecordatorio('<?php echo addslashes($row['nombre']); ?>', '<?php echo $row['token']; ?>')" class="bg-sky-50 text-sky-600 hover:bg-sky-100 px-3 py-1.5 rounded text-sm font-medium transition border border-sky-200" title="Enviar Recordatorio">
-                                        Recordatorio
+                                        Rec
                                     </button>
 
-                                    <button onclick="editarNombre(<?php echo $row['id']; ?>, '<?php echo addslashes($row['nombre']); ?>')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded text-sm font-medium transition border border-amber-200">
+                                    <?php 
+                                        // Definir qué mandar al JS: '1', '0' o 'null'
+                                        $estado_para_js = is_null($row['asiste']) ? 'null' : $row['asiste']; 
+                                    ?>
+                                    <button onclick="abrirModalEditar(<?php echo $row['id']; ?>, '<?php echo addslashes($row['nombre']); ?>', '<?php echo $estado_para_js; ?>')" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded text-sm font-medium transition border border-amber-200">
                                         Editar
                                     </button>
 
@@ -237,6 +250,41 @@ $invitados = $conn->query("SELECT * FROM invitados ORDER BY asiste DESC, nombre 
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-editar" class="fixed inset-0 bg-slate-900 bg-opacity-60 hidden flex items-center justify-center z-50 px-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-sm transform transition-all">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-slate-800">Editar Invitado</h3>
+                <button onclick="cerrarModalEditar()" class="text-slate-400 hover:text-slate-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="form-editar" method="POST" action="">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="id_editar" id="input-id-editar">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nombre o Apodo</label>
+                    <input type="text" name="nombre_editado" id="input-nombre-editado" required class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-amber-500 transition">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Estado de Confirmación</label>
+                    <select name="estado_editado" id="select-estado-editado" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-amber-500 transition">
+                        <option value="null">⏳ Pendiente</option>
+                        <option value="1">✅ Confirmado (Sí asiste)</option>
+                        <option value="0">❌ No asiste</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalEditar()" class="px-5 py-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold transition">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold transition shadow-sm">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 
