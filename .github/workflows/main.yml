@@ -10,13 +10,42 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v3
+    - name: Get latest code
+      uses: actions/checkout@v4
 
-    - name: 📂 Sync files
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: portfolio/package-lock.json
+
+    - name: Build portfolio
+      working-directory: portfolio
+      run: |
+        npm ci
+        npm run build:hosting
+
+    - name: Deploy portfolio to site root
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./  # Esto sube los archivos a la raíz de la ruta que definiste en el FTP
+        local-dir: ./portfolio/dist/
+        server-dir: ./  # Sube el portafolio construido a la raíz configurada en el FTP
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          config.php
+          graduacion/**
+
+    - name: Deploy graduation RSVP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./graduacion/
+        server-dir: ./graduacion/
