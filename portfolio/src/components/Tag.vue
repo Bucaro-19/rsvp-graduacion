@@ -27,6 +27,21 @@ const classes = computed(() => ["tag", `tag-variant-${props.variant}`]);
   }
 
   &-variant {
+    &-swift {
+      background-color: #f05138;
+      color: #fff;
+    }
+
+    &-swiftui {
+      background-color: #0a7cff;
+      color: #fff;
+    }
+
+    &-storekit {
+      background-color: #ffc300;
+      color: #5c3e00;
+    }
+
     &-three {
       background-color: #ed9c55;
       color: #492708;

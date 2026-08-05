@@ -1,3 +1,4 @@
+import thumbnailTempRace from "../../../assets/thumbnails/temprace.svg";
 import thumbnailCubeWar from "../../../assets/thumbnails/cubewar.webp";
 import thumbnailQuibbo from "../../../assets/thumbnails/quibbo.webp";
 //import thumbnailParticles from "../../../assets/thumbnails/particles.webp";
@@ -8,6 +9,12 @@ import thumbnailStreakon from "../../../assets/thumbnails/streakon.webp";
 import type { ProjectPreview } from "../../types";
 
 export default [
+  {
+    title: "TempRace",
+    slug: "temprace",
+    thumbnail: thumbnailTempRace,
+    description: "Party game for iPhone, native SwiftUI",
+  },
   {
     title: "Graduation RSVP",
     slug: "streakon",
