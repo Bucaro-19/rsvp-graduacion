@@ -12,6 +12,7 @@ Esta es la implementación activa. El prototipo anterior de datos se conserva en
 - Exportación pública separada de las capturas crudas: solo alias, perfil público, resultados presenciales completados y metadatos necesarios. Descarta byes, marcadores DQ reconocibles y participantes desconocidos. La elegibilidad final de eventos y DQ ambiguos aún requiere revisión.
 - Publicación por el mismo FTP que usa el portafolio, limitada a una carpeta fija, con sustitución de cada archivo después de completar su subida. `public.json` se sube al final; no se borran archivos existentes de otros proyectos. La raíz de la cuenta se verifica en la primera ejecución real.
 - El ranking usa un método propio transparente y puntos TTS estimados desde el [tierer público de UltRank](https://github.com/kenniky/ultrank-scoring). No calcula la posición exacta de UltRank ni confirma la elegibilidad nacional. El rastreo internacional solo alcanza a jugadores descubiertos localmente o añadidos con fuente documentada.
+- [Plan de criterios para una lista nacional verificable](PLAN-RANKING.md) y [auditoría reproducible de la captura inicial](AUDITORIA-PILOTO-2026-09-28.md). El flujo diario guarda una auditoría de cada corte como artefacto de GitHub Actions.
 
 ## Vista local
 
