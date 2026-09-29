@@ -1,0 +1,33 @@
+name: Revisión del ranking Smash GT
+description: Proponer correcciones de torneos, jugadores, resultados o método del piloto.
+title: "[Smash GT] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por revisar el piloto. Este reporte será público. Comparte enlaces y datos de torneo, pero evita publicar información personal o privada.
+  - type: dropdown
+    id: category
+    attributes:
+      label: ¿Qué quieres revisar?
+      options:
+        - Falta un torneo
+        - Un torneo debería excluirse
+        - Falta un jugador o su elegibilidad está mal
+        - Un resultado está incorrecto
+        - Propuesta sobre la fórmula o las reglas
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Enlace público de referencia
+      description: Preferimos el evento o perfil en start.gg cuando exista.
+      placeholder: https://www.start.gg/...
+  - type: textarea
+    id: explanation
+    attributes:
+      label: ¿Qué debería cambiar y por qué?
+      description: Indica el torneo, jugador, fecha o regla concreta y la evidencia disponible.
+    validations:
+      required: true
