@@ -24,7 +24,7 @@ const loadPreviews = async () => {
 
 const nextProject = computed(() => {
   const previews = loadedPreviews.value;
-  if (!previews) return null;
+  if (!previews || previews.length < 2) return null;
 
   const currentIndex = previews.findIndex((p) => p.slug === projectId);
   if (currentIndex === -1) return null;
