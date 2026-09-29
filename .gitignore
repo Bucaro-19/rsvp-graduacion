@@ -1,1 +1,6 @@
 config.php
+scripts/smash/data/
+scripts/smash/__pycache__/
+.env
+.env.*
+!**/.env.example
