@@ -7,3 +7,10 @@ Options -Indexes
     Header set Cache-Control "no-store"
   </Files>
 </IfModule>
+
+# La encuesta y su panel viven en rankingsmashbros.com desde el 7 de octubre de 2026 y guardan en
+# su base de datos. Las páginas de este dominio escribían en un archivo que ya nadie lee.
+<IfModule mod_alias.c>
+  RedirectMatch 302 ^/ranking-smash-ultimate/encuesta\.php$ https://rankingsmashbros.com/encuesta.php
+  RedirectMatch 302 ^/ranking-smash-ultimate/opiniones\.php$ https://rankingsmashbros.com/opiniones.php
+</IfModule>

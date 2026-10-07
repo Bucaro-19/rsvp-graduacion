@@ -115,5 +115,16 @@ class ExportTests(unittest.TestCase):
             validate_study_data(valid)
 
 
+    def test_survey_pages_of_this_domain_redirect_to_the_dedicated_site(self):
+        # Answers are stored in the database of rankingsmashbros.com; the pages here would write
+        # to a file nobody reads. .htaccess uploads before the PHP pages.
+        import re
+        htaccess = (Path(__file__).resolve().parents[2] / "ranking-smash-ultimate/.htaccess").read_text()
+        for page in ("encuesta", "opiniones"):
+            self.assertRegex(htaccess, r"RedirectMatch 302 \^/ranking-smash-ultimate/%s\\\.php\$ https://rankingsmashbros\.com/%s\.php\n" % (page, page))
+        self.assertLess(FILES.index(".htaccess"), FILES.index("encuesta.php"))
+        self.assertLess(FILES.index(".htaccess"), FILES.index("opiniones.php"))
+
+
 if __name__ == "__main__":
     unittest.main()
